@@ -1,0 +1,189 @@
+<!--# Copyright (C) 2017 INRA
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#-->
+<tool id="plot_pca" name="Plot PCA" version="0.1.0">
+    <description>PCA analysis</description>
+    <requirements>
+        <requirement type="package">R</requirement>
+        <requirement type="package">r-optparse</requirement>
+        <requirement type="package">r-reshape</requirement>
+        <requirement type="package">r-ggplot2</requirement>
+        <requirement type="package">r-gridextra</requirement>
+        <requirement type="package">r-scatterplot3d</requirement>
+    </requirements>
+    <stdio>
+        <!-- Anything other than zero is an error -->
+        <exit_code range="1:" level="fatal"/>
+        <exit_code range=":-1" level="fatal"/>
+    </stdio>
+    <command><![CDATA[
+        Rscript $__tool_directory__/plot_pca.R
+        --input_matrix $input_matrix
+        #if $log_cond.log10:
+          -l $log_cond.pseudocount
+        #end if 
+        #if $height
+          --height $height
+        #end if
+        #if $width
+          --width $width
+        #end if
+        #if $output
+          --output $output
+        #end if
+        #if $metadata_cond.metadata:
+          --metadata          
+          $metadata_cond.input_metadata
+          #for $i, $s in enumerate( $metadata_cond.series )
+            ,${s.input_metadata2}
+          #end for
+          #if $metadata_cond.color_by
+            --color_by $metadata_cond.color_by
+          #end if
+          #if $metadata_cond.shape_by
+            --shape_by $metadata_cond.shape_by
+          #end if
+        #end if
+         --border
+         --palette=$__tool_directory__/rainbow.3.txt
+         &&
+         cp *.pdf $outputfile
+          ]]></command>
+                  <inputs>
+
+			<param argument="--input_matrix" type="data" format="csv,tsv,txt" label="Input Matrix"/>
+
+			<conditional name="log_cond">
+				<param name="log10" type="boolean" checked="false" truevalue="True" falsevalue="" label="Apply the log10" help="Default=No"/>
+				<when value="True">
+					<param name="pseudocount" type="float" value="1e-04" help="Default=1e-04" />
+				</when>
+			</conditional>
+
+                        <conditional name="metadata_cond">
+                               <param name="metadata" type="boolean" checked="false" truevalue="Yes" falsevalue="" label="Add file with metadata on matrix experiment?" help="must countain a key named 'labExpId"/>
+                                <when value="Yes">
+                                        <param name="input_metadata" type="data" format="tsv" label="Input Metadata file"/> 
+	                                <repeat name="series" title="Others Input Metadata files">
+					    <param name="input_metadata2" type="data" format="tsv" label="Other Input Metadata file"/>
+					</repeat>
+                 			<param argument="--color_by" type="text" label="Choose the fields in the metadata you want to color by" /> 
+                   			<param argument="--shape_by" type="text" label="Choose the fields in the metadata you want to shape by" />  
+                               </when>
+                        </conditional>
+
+			<param argument="--height" size="20" type="integer" value="7"  label="Height of the plot in inches" /> 
+
+			<param argument="--width" size="20" type="integer" value="7"  label="Width of the plot in inches" />
+
+			<param argument="--output" type="text" label="Output name" help="[Optional] Specify the project label for your outputs. By default it will be the name of your input file."/>
+
+                  </inputs>
+                  <outputs>
+                     <data format="pdf" name="outputfile" label ="#if str($output)=='' then os.path.splitext(str($input_matrix.name))[0]  else $output #_PCA.pdf"/>
+                  </outputs>
+  <help><![CDATA[
+
+.. class:: infomark
+
+**Authors**
+Alessandra Breschi; 
+Valentin Marcon
+
+---------------------------------------------------
+
+.. class:: infomark
+
+Usage: ./plot_pca.R [options] file
+
+Options:
+	-i INPUT_MATRIX, --input_matrix=INPUT_MATRIX
+			the matrix you want to analyze. Can be stdin
+
+	-l, --log10
+			apply the log [default=FALSE]
+
+	-p PSEUDOCOUNT, --pseudocount=PSEUDOCOUNT
+			specify a pseudocount for the log [default=1e-04]
+
+	-m METADATA, --metadata=METADATA
+			A list of tsv files with metadata on matrix experiment.
+					They must be in the format 'file1.tsv,file2.tsv' and contain a key column named 'labExpId'. Can be omitted
+
+	--merge_mdata_on=MERGE_MDATA_ON
+			[default=labExpId]
+
+	-c COLOR_BY, --color_by=COLOR_BY
+			choose the fields in the metadata you want to color by
+
+	--sort_color=SORT_COLOR
+			A field for sorting colors. Can be omitted [default=NULL]
+
+	-s SHAPE_BY, --shape_by=SHAPE_BY
+			choose the fields in the metadata you want to shape by
+
+	--no_legend
+			Do not show the legend [default=FALSE]
+
+	-r, --row_as_variables
+			select this if you want rows as variables [default=FALSE]
+
+	-C PRINCOMP, --princomp=PRINCOMP
+			choose the principal components you want to plot. With 3 PC it gives a 3d plot [default='PC1,PC2']
+
+	--print_scores
+			Output the resuling PCs as a separate file with the extension PCs.tsv [default=FALSE]
+
+	--print_loadings
+			Output the resulting loadings as a separate file with the extension loadings.tsv [default=FALSE]
+
+	--print_lambdas
+			Output the resulting lambdas (stdev) as a separate file with the extension lambdas.tsv [default=FALSE]
+
+	--biplot
+			If active, the factor of the color is used as grouping factor.
+				Centroids are computed and the first <top> loadings are plotted wrt to the two specified components [default=FALSE]
+
+	--palette=PALETTE
+			File with the color palette [default=/users/rg/abreschi/R/palettes/cbbPalette1.15.txt]
+
+	--border
+			Black border to dots [default=FALSE]
+
+	--shapes=SHAPES
+			File with the shapes [default=NULL]
+
+	-L LABELS, --labels=LABELS
+			The metadata field with the labels [default=NULL]
+
+	-B BASE_SIZE, --base_size=BASE_SIZE
+			Base font size [default=16]
+
+	-H HEIGHT, --height=HEIGHT
+			Height of the plot in inches [default=7]
+
+	-W WIDTH, --width=WIDTH
+			Width of the plot in inches [default=7]
+
+	-o OUTPUT, --output=OUTPUT
+			output file name [default=pca.out]
+
+	-v, --verbose
+			verbose output [default=FALSE]
+
+	-h, --help
+			Show this help message and exit
+
+  ]]></help>
+</tool>
