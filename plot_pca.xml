@@ -59,47 +59,111 @@
          --palette=$__tool_directory__/rainbow.3.txt
          &&
          cp *.pdf $outputfile
-          ]]></command>
-                  <inputs>
+    ]]></command>
+    <inputs>
+        <param argument="--input_matrix" type="data" format="csv,tsv,txt" label="Input Matrix"/>
 
-			<param argument="--input_matrix" type="data" format="csv,tsv,txt" label="Input Matrix"/>
+        <conditional name="log_cond">
+            <param name="log10" type="boolean" checked="false" truevalue="True" falsevalue="" label="Apply the log10" help="Default=No"/>
+            <when value="True">
+                <param name="pseudocount" type="float" value="1e-04" help="Default=1e-04" />
+            </when>
+        </conditional>
 
-			<conditional name="log_cond">
-				<param name="log10" type="boolean" checked="false" truevalue="True" falsevalue="" label="Apply the log10" help="Default=No"/>
-				<when value="True">
-					<param name="pseudocount" type="float" value="1e-04" help="Default=1e-04" />
-				</when>
-			</conditional>
+        <conditional name="metadata_cond">
+            <param name="metadata" type="boolean" checked="false" truevalue="Yes" falsevalue="" label="Add file with metadata on matrix experiment?" help="must countain a key column named 'labExpId"/>
+            <when value="Yes">
+                <param name="input_metadata" type="data" format="tsv" label="Input Metadata file"/> 
+                <repeat name="series" title="Others Input Metadata files">
+                    <param name="input_metadata2" type="data" format="tsv" label="Other Input Metadata file"/>
+                </repeat>
+                <param argument="--color_by" type="text" label="Choose the fields in the metadata you want to color by" /> 
+                <param argument="--shape_by" type="text" label="Choose the fields in the metadata you want to shape by" />  
+            </when>
+        </conditional>
 
-                        <conditional name="metadata_cond">
-                               <param name="metadata" type="boolean" checked="false" truevalue="Yes" falsevalue="" label="Add file with metadata on matrix experiment?" help="must countain a key named 'labExpId"/>
-                                <when value="Yes">
-                                        <param name="input_metadata" type="data" format="tsv" label="Input Metadata file"/> 
-	                                <repeat name="series" title="Others Input Metadata files">
-					    <param name="input_metadata2" type="data" format="tsv" label="Other Input Metadata file"/>
-					</repeat>
-                 			<param argument="--color_by" type="text" label="Choose the fields in the metadata you want to color by" /> 
-                   			<param argument="--shape_by" type="text" label="Choose the fields in the metadata you want to shape by" />  
-                               </when>
-                        </conditional>
+        <param argument="--height" size="20" type="integer" value="7"  label="Height of the plot in inches" /> 
+        <param argument="--width" size="20" type="integer" value="7"  label="Width of the plot in inches" />
+        <param argument="--output" type="text" label="Output name" help="[Optional] Specify the project label for your outputs. By default it will be the name of your input file."/>
+    </inputs>
+    <outputs>
+        <data format="pdf" name="outputfile" label ="#if str($output)=='' then os.path.splitext(str($input_matrix.name))[0]  else $output #_PCA.pdf"/>
+    </outputs>
+    <help><![CDATA[
 
-			<param argument="--height" size="20" type="integer" value="7"  label="Height of the plot in inches" /> 
+========
+Plot PCA
+========
 
-			<param argument="--width" size="20" type="integer" value="7"  label="Width of the plot in inches" />
+-----------
+Description
+-----------
 
-			<param argument="--output" type="text" label="Output name" help="[Optional] Specify the project label for your outputs. By default it will be the name of your input file."/>
+Plot a Principal Component Analysis (PCA) from a data matrix
 
-                  </inputs>
-                  <outputs>
-                     <data format="pdf" name="outputfile" label ="#if str($output)=='' then os.path.splitext(str($input_matrix.name))[0]  else $output #_PCA.pdf"/>
-                  </outputs>
-  <help><![CDATA[
+-----------
+Input files
+-----------
+
++---------------------------+----------------+
+| Parameter : num + label   |   Format       |
++===========================+================+
+| 1 : Input matrix          |   csv,tabular  |
++---------------------------+----------------+
+
+----------
+Parameters
+----------
+
+Apply the log 10
+        | To normalize your data
+        | 
+
+(?)Add file with metadata on matrix experiment?
+        | To ad metadata to the analysis
+        |
+
+Input Metadata file
+        | Must countain a key column named labExpId
+        | 
+
+Others Metadata files
+        |  
+
+Choose the fields in the metadata you want to color by
+        |  
+
+Choose the fields in the metadata you want to shape by
+        | 
+
+Height of the plot in inches
+        | default 7 inches 
+        | 
+
+Width of the plot in inches
+        | default 7 inches 
+        | 
+
+Output name
+        | Specify the project label for your outputs. By default it will be the name of your input file 
+        | 
+
+------------
+Output files
+------------
+
+<Input Name>_PCA.pdf
+        | Pdf file containing your PCA plot
+
+
+---------------------------------------------------
 
 .. class:: infomark
 
 **Authors**
-Alessandra Breschi; 
-Valentin Marcon
+Alessandra Breschi (alessandra.breschi@crg.eu); 
+Sarah Djebali (sarah.djebali-quelen@inra.fr);
+Valentin Marcon (valentin.marcon@inra.fr)
 
 ---------------------------------------------------
 
