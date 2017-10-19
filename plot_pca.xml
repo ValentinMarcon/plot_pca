@@ -12,7 +12,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #-->
-<tool id="plot_pca" name="Plot PCA" version="0.1.0">
+<tool id="plot_pca" name="Plot PCA" version="1.0.0">
     <description>PCA analysis</description>
     <requirements>
         <requirement type="package">R</requirement>
@@ -61,7 +61,7 @@
          cp *.pdf $outputfile
     ]]></command>
     <inputs>
-        <param argument="--input_matrix" type="data" format="csv,tsv,txt" label="Input Matrix"/>
+        <param argument="--input_matrix" type="data" format="csv,tabular" label="Input Matrix"/>
 
         <conditional name="log_cond">
             <param name="log10" type="boolean" checked="false" truevalue="True" falsevalue="" label="Apply the log10" help="Default=No"/>
@@ -156,16 +156,27 @@ Output files
         | Pdf file containing your PCA plot
 
 
----------------------------------------------------
-
-.. class:: infomark
+------
 
 **Authors**
 Alessandra Breschi (alessandra.breschi@crg.eu); 
 Sarah Djebali (sarah.djebali-quelen@inra.fr);
 Valentin Marcon (valentin.marcon@inra.fr)
 
----------------------------------------------------
+Contact : sigenae-support@listes.inra.fr
+
+-------------
+Please cite :
+-------------
+
+- (Depending on the help provided you can cite us in acknowledgements)
+    
+Acknowledgements
+        | We wish to thank : Alessandra Breschi,Sarah Djebali (), and Valentin Marcon (Migale platform - http://migale.jouy.inra.fr/)
+
+
+
+------
 
 .. class:: infomark
 
