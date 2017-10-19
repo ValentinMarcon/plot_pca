@@ -91,7 +91,7 @@
     </outputs>
     <tests>
         <test>
-            <param name="input_matrix" value="input" />
+            <param name="input_matrix" value="decathlon.tsv" />
             <conditional name="log_cond">
                 <param name="log10" value="True" />
                 <param name="pseudocount" value="1e-04" />
