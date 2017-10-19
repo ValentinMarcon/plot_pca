@@ -89,6 +89,23 @@
     <outputs>
         <data format="pdf" name="outputfile" label ="#if str($output)=='' then os.path.splitext(str($input_matrix.name))[0]  else $output #_PCA.pdf"/>
     </outputs>
+    <tests>
+        <test>
+            <param name="input_matrix" value="input" />
+            <conditional name="log_cond">
+                <param name="log10" value="True" />
+                <param name="pseudocount" value="1e-04" />
+            </conditional>
+            <conditional name="metadata_cond">
+                <param name="metadata" value="" />
+            </conditional>
+            <param name="height" value="7" />
+            <param name="width" value="7" />
+            <param name="output" value="" />
+            <output name="outputfile" file="output" compare="sim_size" />
+        </test>
+    </tests>
+
     <help><![CDATA[
 
 ========
