@@ -131,9 +131,17 @@ if (opt$verbose) {sprintf("WARNING: column %s is character, so it is removed fro
 if (opt$log10) {m = log10(replace(m, is.na(m), 0) + opt$pseudocount)}
 
 # apply pca
+#if (opt$row_as_variable) {
+#m_pca = prcomp(na.omit(m), center=FALSE, scale.=FALSE)} else{
+#m_pca = prcomp(t(na.omit(m)), center=FALSE, scale.=FALSE)}
+#Modified by Gaelle Lefort
+# apply pca
 if (opt$row_as_variable) {
-m_pca = prcomp(na.omit(m), center=FALSE, scale.=FALSE)} else{
-m_pca = prcomp(t(na.omit(m)), center=FALSE, scale.=FALSE)}
+m_pca = prcomp(t(na.omit(m)), center=FALSE, scale.=FALSE)
+} else {
+m_pca = prcomp(na.omit(m), center=FALSE, scale.=FALSE)
+}
+
 
 # Scale the scores for biplot
 #scaledScores = sweep(m_pca$x, 2, m_pca$sdev / sqrt(nrow(m_pca$x)), "/")
